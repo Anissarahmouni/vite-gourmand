@@ -1,4 +1,3 @@
-# vite-gourmand
 # Vite & Gourmand
 
 Web app de catering pour Vite & Gourmand.
