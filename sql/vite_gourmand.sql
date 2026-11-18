@@ -1,10 +1,3 @@
--- =====================================================================
--- Vite & Gourmand : base de données relationnelle (MySQL / MariaDB)
--- Compatible XAMPP + phpMyAdmin (onglet "Importer")
--- Contenu : création des tables + données de test
--- =====================================================================
-
--- Le script peut être relancé : il repart d'une base vide.
 DROP DATABASE IF EXISTS vite_gourmand;
 CREATE DATABASE vite_gourmand CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE vite_gourmand;
@@ -36,7 +29,7 @@ CREATE TABLE allergene (
 CREATE TABLE horaire (
     horaire_id      INT AUTO_INCREMENT PRIMARY KEY,
     jour            VARCHAR(10) NOT NULL UNIQUE,
-    heure_ouverture VARCHAR(10),            -- NULL si fermé
+    heure_ouverture VARCHAR(10),            
     heure_fermeture VARCHAR(10)
 ) ENGINE=InnoDB;
 
@@ -46,21 +39,21 @@ CREATE TABLE horaire (
 
 CREATE TABLE utilisateur (
     utilisateur_id  INT AUTO_INCREMENT PRIMARY KEY,
-    email           VARCHAR(150) NOT NULL UNIQUE,   -- sert d'identifiant (username)
-    password        VARCHAR(255) NOT NULL,          -- mot de passe HASHÉ (jamais en clair)
+    email           VARCHAR(150) NOT NULL UNIQUE,   
+    password        VARCHAR(255) NOT NULL,          
     nom             VARCHAR(100) NOT NULL,
     prenom          VARCHAR(100) NOT NULL,
     telephone       VARCHAR(20)  NOT NULL,
     adresse_postale VARCHAR(255) NOT NULL,
     ville           VARCHAR(100) NOT NULL,
     pays            VARCHAR(100) NOT NULL DEFAULT 'France',
-    actif           TINYINT(1)   NOT NULL DEFAULT 1,   -- 0 = compte désactivé
+    actif           TINYINT(1)   NOT NULL DEFAULT 1,   
     role_id         INT          NOT NULL,
     created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_utilisateur_role FOREIGN KEY (role_id) REFERENCES role(role_id)
 ) ENGINE=InnoDB;
 
--- Jetons de réinitialisation du mot de passe (lien envoyé par mail)
+
 CREATE TABLE reset_password (
     reset_id       INT AUTO_INCREMENT PRIMARY KEY,
     utilisateur_id INT          NOT NULL,
@@ -89,12 +82,12 @@ CREATE TABLE menu (
     CONSTRAINT fk_menu_theme  FOREIGN KEY (theme_id)  REFERENCES theme(theme_id)
 ) ENGINE=InnoDB;
 
--- Galerie d'images d'un menu
+
 CREATE TABLE menu_image (
     image_id  INT AUTO_INCREMENT PRIMARY KEY,
     menu_id   INT          NOT NULL,
     url       VARCHAR(255) NOT NULL,
-    texte_alt VARCHAR(150) NOT NULL,                -- texte alternatif (accessibilité RGAA)
+    texte_alt VARCHAR(150) NOT NULL,                
     CONSTRAINT fk_image_menu FOREIGN KEY (menu_id) REFERENCES menu(menu_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -105,7 +98,7 @@ CREATE TABLE plat (
     photo_url VARCHAR(255)
 ) ENGINE=InnoDB;
 
--- Un plat peut être dans plusieurs menus, un menu a plusieurs plats
+
 CREATE TABLE menu_plat (
     menu_id INT NOT NULL,
     plat_id INT NOT NULL,
@@ -114,7 +107,7 @@ CREATE TABLE menu_plat (
     CONSTRAINT fk_menuplat_plat FOREIGN KEY (plat_id) REFERENCES plat(plat_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Un plat peut contenir plusieurs allergènes
+
 CREATE TABLE plat_allergene (
     plat_id      INT NOT NULL,
     allergene_id INT NOT NULL,
@@ -132,21 +125,21 @@ CREATE TABLE commande (
     numero_commande         VARCHAR(20)  NOT NULL UNIQUE,
     utilisateur_id          INT          NOT NULL,
     menu_id                 INT          NOT NULL,
-    date_commande           DATE         NOT NULL,                 -- renseignée par l'application
+    date_commande           DATE         NOT NULL,                 
     date_prestation         DATE         NOT NULL,
     heure_livraison         VARCHAR(10)  NOT NULL,
     adresse_prestation      VARCHAR(255) NOT NULL,
     ville_prestation        VARCHAR(100) NOT NULL,
-    distance_km             DECIMAL(6,1) NOT NULL DEFAULT 0,       -- 0 si livraison à Bordeaux
+    distance_km             DECIMAL(6,1) NOT NULL DEFAULT 0,      
     nombre_personne         INT          NOT NULL CHECK (nombre_personne > 0),
-    prix_menu               DECIMAL(8,2) NOT NULL,                 -- après réduction éventuelle de 10 %
-    prix_livraison          DECIMAL(8,2) NOT NULL DEFAULT 0,       -- 5 € + 0,59 €/km hors Bordeaux
+    prix_menu               DECIMAL(8,2) NOT NULL,                 
+    prix_livraison          DECIMAL(8,2) NOT NULL DEFAULT 0,       
     statut                  VARCHAR(30)  NOT NULL DEFAULT 'en_attente'
         CHECK (statut IN ('en_attente', 'accepte', 'en_preparation', 'en_cours_livraison',
                           'livre', 'en_attente_retour_materiel', 'terminee', 'annulee')),
     pret_materiel           TINYINT(1)   NOT NULL DEFAULT 0,
     restitution_materiel    TINYINT(1)   NOT NULL DEFAULT 0,
-    motif_annulation        TEXT,                                  -- rempli par l'employé s'il annule
+    motif_annulation        TEXT,                                  
     mode_contact_annulation VARCHAR(10) CHECK (mode_contact_annulation IN ('gsm', 'mail')),
     CONSTRAINT fk_commande_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(utilisateur_id),
     CONSTRAINT fk_commande_menu        FOREIGN KEY (menu_id)        REFERENCES menu(menu_id)
@@ -187,7 +180,7 @@ INSERT INTO allergene (libelle) VALUES
     ('Gluten'), ('Lait'), ('Œufs'), ('Arachides'), ('Fruits à coque'),
     ('Poisson'), ('Crustacés'), ('Soja'), ('Céleri'), ('Moutarde'), ('Sésame');
 
--- Horaires (d'après la maquette)
+-- Horaires 
 INSERT INTO horaire (jour, heure_ouverture, heure_fermeture) VALUES
     ('Lundi',    '9h00',  '12h00'),
     ('Mardi',    '8h00',  '19h30'),
@@ -197,12 +190,6 @@ INSERT INTO horaire (jour, heure_ouverture, heure_fermeture) VALUES
     ('Samedi',   '8h00',  '19h30'),
     ('Dimanche', '8h00',  '19h30');
 
--- ---------------------------------------------------------------------
--- Utilisateurs de test
--- ATTENTION : les mots de passe ci-dessous sont des PLACEHOLDERS.
--- Les vrais hash seront générés par l'application PHP (password_hash)
--- avant la mise en ligne. Ne jamais stocker un mot de passe en clair.
--- ---------------------------------------------------------------------
 INSERT INTO utilisateur (email, password, nom, prenom, telephone, adresse_postale, ville, role_id) VALUES
     ('jose@vite-gourmand.fr',  'HASH_A_GENERER', 'Martin',  'José',   '0600000001', '3 rue Lacroix',  'Bordeaux', 3),
     ('julie@vite-gourmand.fr', 'HASH_A_GENERER', 'Martin',  'Julie',  '0600000002', '3 rue Lacroix',  'Bordeaux', 2),
@@ -264,12 +251,7 @@ INSERT INTO menu_plat (menu_id, plat_id) VALUES
     (2, 3), (2, 5), (2, 8),     -- Pâques
     (3, 2), (3, 6), (3, 9);     -- Brunch en famille
 
--- ---------------------------------------------------------------------
--- Commandes de test
--- Commande 1 : 8 pers., menu min. 6 pers. à 180 € -> 30 €/pers. = 240 €, pas de réduction, livraison Bordeaux
--- Commande 2 : 10 pers., menu min. 4 pers. à 90 € -> 22,50 €/pers. = 225 €,
---              -10 % (10 >= 4 + 5) = 202,50 € ; livraison hors Bordeaux : 5 + 0,59 x 12 km = 12,08 €
--- ---------------------------------------------------------------------
+
 INSERT INTO commande (numero_commande, utilisateur_id, menu_id, date_commande, date_prestation, heure_livraison,
                       adresse_prestation, ville_prestation, distance_km, nombre_personne, prix_menu, prix_livraison, statut) VALUES
     ('CMD-0001', 3, 1, '2026-10-02', '2026-10-20', '12:30', '12 rue Sainte-Catherine', 'Bordeaux', 0,  8,  240.00, 0.00,  'terminee'),
@@ -282,7 +264,6 @@ INSERT INTO commande_suivi (commande_id, statut, modifie_le) VALUES
     (1, 'livre',               '2026-10-20 12:30:00'),
     (1, 'terminee',            '2026-10-20 12:35:00');
 
--- Avis validés (affichés sur la page d'accueil)
 INSERT INTO avis (utilisateur_id, commande_id, note, commentaire, statut) VALUES
     (3, 1, 5, 'Un délice, je recommande', 'valide'),
     (4, 2, 5, 'Je suis très satisfait du service', 'valide');
