@@ -1,4 +1,0 @@
-Place ici les photos exportées depuis Figma, avec ces noms :
-menu-noel-1.jpg, menu-noel-2.jpg, menu-paques-1.jpg, menu-brunch-1.jpg
-(Dans Figma : sélectionne une photo > Exporter en bas du panneau de droite > JPG.)
-Si une image est absente, le site s'affiche quand même sans elle.
