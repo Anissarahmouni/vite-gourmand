@@ -18,16 +18,16 @@ function reponse($donnees, int $code = 200): void
     exit;
 }
 
-// Identifiants par défaut de XAMPP : utilisateur "root", sans mot de passe.
+// Identifiants par défaut de MAMPP : utilisateur "root", sans mot de passe.
 // En production, ils viendront de variables d'environnement.
 $hote = '127.0.0.1';
 $base = 'vite_gourmand';
 $utilisateurBdd = 'root';
-$motDePasseBdd = '';
+$motDePasseBdd = 'root';
 
 try {
     $pdo = new PDO(
-        "mysql:host=$hote;dbname=$base;charset=utf8mb4",
+        "mysql:host=$hote;port=8889;dbname=$base;charset=utf8mb4",
         $utilisateurBdd,
         $motDePasseBdd,
         [
